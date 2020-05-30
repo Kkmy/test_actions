@@ -1,22 +1,28 @@
-CXXFLAGS = -g -Wall -Werror -std=c++11
-LDLIBS =
+TARGET = app
 
-PRGM  = project
-SRCS := $(main.cpp)
-OBJS := $(SRCS:.cpp=.o)
-DEPS := $(OBJS:.o=.d)
+SRCS =  $(shell find ./src	-type f -name *.cpp)
+HEADS = $(shell find ./include  -type f -name *.h)
+OBJS =  $(SRCS:.cpp=.o)
+DEPS =  Makefile.depend
 
-.PHONY: all clean
+INCLUDES = -I./include
+CXXFLAGS = -02 -Wall $(INCLUDES)
+LDFLAGS = -lm
 
-all: $(PRGM)
+all: $(TARGET)
 
-$(PRGM): $(OBJS)
-	$(CXX) $(OBJS) $(LDLIBS) -o $@
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
-
+$(TARGET): $(OBJS) $(HEADS)
+  $(CXX) $(LDFLAGS) -o $@ $(OBJS)
+  
+run: all
+  @./$(TARGET)
+  
+.PHONY: depend clean
+depend:
+  $(CXX) $(INCLUDE) -MM $(SRCS) > $(DEPS)
+  @sed -i -E "s/^(.+?).o: ([^ ]+?)\1/\2\1.o: \2\1/g" $(DEPS)
+  
 clean:
-	rm -rf $(OBJS) $(DEPS) $(PRGM)
-
--include $(DEPS)
+  $(RM) $(OBJS) $(TARGET)
+  
+ -include $(DEPS)

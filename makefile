@@ -2,7 +2,7 @@ CXXFLAGS = -g -Wall -Werror -std=c++11
 LDLIBS =
 
 PRGM  = project
-SRCS := $(wildcard *.cpp)
+SRCS := $(main.cpp)
 OBJS := $(SRCS:.cpp=.o)
 DEPS := $(OBJS:.o=.d)
 

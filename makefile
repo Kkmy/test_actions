@@ -1,35 +1,22 @@
-COMPILER  = g++
-CFLAGS    = -g -MMD -MP -Wall -Wextra -Winit-self -Wno-missing-field-initializers
-ifeq "$(shell getconf LONG_BIT)" "64"
-  LDFLAGS =
-else
-  LDFLAGS =
-endif
-LIBS      =
-INCLUDE   = -I./include
-TARGET    = ./bin/$(shell basename `readlink -f .`)
-SRCDIR    = ./source
-ifeq "$(strip $(SRCDIR))" ""
-  SRCDIR  = .
-endif
-SOURCES   = $(wildcard $(SRCDIR)/*.cpp)
-OBJDIR    = ./obj
-ifeq "$(strip $(OBJDIR))" ""
-  OBJDIR  = .
-endif
-OBJECTS   = $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.cpp=.o)))
-DEPENDS   = $(OBJECTS:.o=.d)
+CXXFLAGS = -g -Wall -Werror -std=c++11
+LDLIBS =
 
-$(TARGET): $(OBJECTS) $(LIBS)
-	$(COMPILER) -o $@ $^ $(LDFLAGS)
+PRGM  = project
+SRCS := $(wildcard *.cpp)
+OBJS := $(SRCS:.cpp=.o)
+DEPS := $(OBJS:.o=.d)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	-mkdir -p $(OBJDIR)
-	$(COMPILER) $(CFLAGS) $(INCLUDE) -o $@ -c $<
+.PHONY: all clean
 
-all: clean $(TARGET)
+all: $(PRGM)
+
+$(PRGM): $(OBJS)
+	$(CXX) $(OBJS) $(LDLIBS) -o $@
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 clean:
-	-rm -f $(OBJECTS) $(DEPENDS) $(TARGET)
+	rm -rf $(OBJS) $(DEPS) $(PRGM)
 
--include $(DEPENDS)
+-include $(DEPS)
